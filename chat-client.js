@@ -32,6 +32,7 @@ async function main() {
                 { sender: 'spentak', message: 'endless uses' }
             ]
         },
+        genesis: require.resolve('../genesis.json'),
         peers: peers ? [peers] : [],
         logTendermint: false
     }
