@@ -2,7 +2,6 @@ let axios = require('axios')
 let argv = require('minimist')(process.argv.slice(2))
 let leftPad = require('left-pad')
 let lotion = require('lotion');
-
 let chatId = argv.j
 let peers = argv.p
 
@@ -22,9 +21,6 @@ async function main() {
 `
     )
     let opts = {
-        lotionPort: port,
-        p2pPort: 46656,
-        tendermintPort: 46657,
         initialState: {
             messages: [
                 { sender: 'spentak', message: 'secure chat' },
@@ -32,12 +28,7 @@ async function main() {
                 { sender: 'spentak', message: 'endless uses' }
             ]
         },
-        genesis: require.resolve('./genesis.json'),
-        peers: peers ? [peers] : [],
         logTendermint: false
-    }
-    if (chatId) {
-        opts.networkId = chatId
     }
     let app = lotion(opts);
     let bar = '================================================================='
@@ -142,8 +133,6 @@ async function main() {
             let { data } = await axios.get('http://localhost:' + port + '/state')
             updateState(data)
         }, 500)
-    }, err => {
-        console.log(err);
     }).catch((err) => {
         console.error(err.stack)
     })

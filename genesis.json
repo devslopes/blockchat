@@ -1,15 +1,1 @@
-{
-  "app_hash": "de9344fb285ad9dd54b93d6464b3805bb7b4a772416c7ea5334e6093045d3aca",
-  "chain_id": "spentak-chat",
-  "genesis_time": "0001-01-01T00:00:00Z",
-  "validators": [
-    {
-      "name": "mark-price-macbook",
-      "power": 10,
-      "pub_key": {
-        "data": "2C5E61A19D6952D9011C46615768FF611AFF872E08279FEC9B17EEB3FFFC9116",
-        "type": "ed25519"
-      }
-    }
-  ]
-}
+{"app_hash":"de9344fb285ad9dd54b93d6464b3805bb7b4a772416c7ea5334e6093045d3aca","chain_id":"test-chain-dBz3Ae","genesis_time":"0001-01-01T00:00:00Z","validators":[{"name":"","power":10,"pub_key":{"data":"4B71A6A3BD3AED1B1261606154F11346A186995627E5EF57293B77424CE0D797","type":"ed25519"}}]}
