@@ -4,7 +4,7 @@
   "genesis_time": "0001-01-01T00:00:00Z",
   "validators": [
     {
-      "name": "",
+      "name": "mark-price-macbook",
       "power": 10,
       "pub_key": {
         "data": "2C5E61A19D6952D9011C46615768FF611AFF872E08279FEC9B17EEB3FFFC9116",
