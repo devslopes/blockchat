@@ -1,5 +1,6 @@
 let lotion = require('lotion');
-let genesis = require.resolve('./genesis.json');
+let os = require('os')
+// let genesis = require.resolve('./devslopes-genesis.json');
 let port = 3000;
 
 async function main() {
@@ -12,6 +13,8 @@ async function main() {
     )
 
     let opts = {
+        keys: os.homedir() + '/.lotion/priv_validator.json',
+        genesis: genesis,
         initialState: {
             messages: [
                 { sender: 'Devslopes', message: 'secure chat' },

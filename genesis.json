@@ -1,0 +1,31 @@
+{
+  "app_hash": "eb62f2afbdc19d3cf4b7bcba237982be1b4d7a41",
+  "chain_id": "mycoolblockchainapp",
+  "genesis_time": "0001-01-01T00:00:00Z",
+  "validators": [
+    {
+      "name": "",
+      "power": 10,
+      "pub_key": {
+        "data": "C2BFD789B00FC0D42A4FC53EF31AB324912E262D51C4044161A3200D10FDD1F6",
+        "type": "ed25519"
+      }
+    },
+    {
+      "name": "",
+      "power": 10,
+      "pub_key": {
+        "data": "A2BFR789B00FC0D42A4FC53EF31AB324912E362D51C4044161A3200D10FDD1F6",
+        "type": "ed25519"
+      }
+    },
+    {
+      "name": "",
+      "power": 10,
+      "pub_key": {
+        "data": "L1BFD789B00FC0D42A4FC53EF31AB324812E262D51C4044161A3200D10FDD1F6",
+        "type": "ed25519"
+      }
+    }
+  ]
+}
