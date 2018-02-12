@@ -1,36 +1,30 @@
-let axios = require('axios')
-let argv = require('minimist')(process.argv.slice(2))
 let leftPad = require('left-pad')
-let lotion = require('lotion');
-let chatId = argv.j
-let peers = argv.p
-
+let { connect } = require('lotion');
+let genesis = require('./genesis.json');
+let config = require('./peers.js')
 let readline = require('readline')
+
 let rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout,
-    prompt: 'choose a username ~ '
+    output: process.stdout
 });
-let port = 3000;
+rl.setPrompt('choose a username ~ ');
+
+const APP_ID = "89a6244c04b9560fe2a8c75f1e75c432c00961b1ac254744866cf37fb1193e7d";
+
 async function main() {
-    console.log('starting blockchain interface on port ' + port + '...\n');
-    console.log(
-        ` 
-    chain state : http://localhost:${port}/state
-    transactions: http://localhost:${port}/txs
-`
-    )
-    let opts = {
-        initialState: {
-            messages: [
-                { sender: 'spentak', message: 'secure chat' },
-                { sender: 'spentak', message: 'on the blockchain' },
-                { sender: 'spentak', message: 'endless uses' }
-            ]
-        },
-        logTendermint: false
+    let timeout = setTimeout(() => console.log('Connecting...'), 2000);
+    let client;
+    try {
+        client = await connect(APP_ID);
+        console.log('connected');
+    } catch (err) {
+        console.log(err);
     }
-    let app = lotion(opts);
+
+    clearTimeout(timeout);
+    rl.prompt()
+
     let bar = '================================================================='
     let link = '                                |                                '
     function logMessage({ sender, message }, index) {
@@ -55,87 +49,69 @@ async function main() {
         rl.prompt(true)
     }
 
-    let msgHandler = (state, tx) => {
-        if (
-            typeof tx.sender === 'string' &&
-            typeof tx.message === 'string' &&
-            tx.message.length <= 50
-        ) {
-            if (tx.message !== '') {
-                state.messages.push({
-                    sender: tx.sender,
-                    message: tx.message
-                });
-            }
+    let username
+
+    function usernameError(name) {
+        if (name.length > 12) {
+            return 'Username is too long'
         }
+        if (name.length < 3) {
+            return 'Username is too short'
+        }
+        if (name.indexOf(' ') !== -1) {
+            return 'Username may not contain a space'
+        }
+        return false
     }
 
-    app.use(msgHandler);
-    app.listen(3000).then(genesisKey => {
-        console.log('chat room id is ' + genesisKey.GCI + '\n')
-        rl.prompt()
-
-        let username
-
-        function usernameError(name) {
-            if (name.length > 12) {
-                return 'Username is too long'
-            }
-            if (name.length < 3) {
-                return 'Username is too short'
-            }
-            if (name.indexOf(' ') !== -1) {
-                return 'Username may not contain a space'
-            }
-            return false
-        }
-
-        rl.on('line', async line => {
-            readline.moveCursor(process.stdout, 0, -1)
-            readline.clearScreenDown(process.stdout)
-            line = line.trim()
-            if (!username) {
-                let e = usernameError(line)
-                if (e) {
-                    console.log(e)
-                } else {
-                    username = line
-                    rl.setPrompt('> ')
-                }
+    rl.on('line', async line => {
+        readline.moveCursor(process.stdout, 0, -1)
+        readline.clearScreenDown(process.stdout)
+        line = line.trim()
+        if (!username) {
+            let e = usernameError(line)
+            if (e) {
+                console.log(e)
             } else {
-                let message = line
-                let result = await axios({
-                    url: 'http://localhost:' + port + '/txs',
-                    method: 'post',
-                    params: {
-                        return_state: true
-                    },
-                    data: {
-                        message,
-                        sender: username
-                    }
-                })
-                updateState(result.data.state)
+                username = line
+                rl.setPrompt('> ')
             }
-
-            rl.prompt(true)
-        })
-
-        // poll blockchain state
-        let lastMessagesLength = 0
-        function updateState(state) {
-            for (let i = lastMessagesLength; i < state.messages.length; i++) {
-                logMessage(state.messages[i], i)
-            }
-            lastMessagesLength = state.messages.length
+        } else {
+            let message = line;
+            const result = await client.send({
+                message,
+                sender: username
+            });
+            //const state = await client.getState();
+            updateState(state)
         }
-        setInterval(async () => {
-            let { data } = await axios.get('http://localhost:' + port + '/state')
-            updateState(data)
-        }, 500)
-    }).catch((err) => {
-        console.error(err.stack)
+
+        rl.prompt(true)
     })
+
+    // poll blockchain state
+    let lastMessagesLength = 0
+    function updateState(state) {
+        for (let i = lastMessagesLength; i < state.messages.length; i++) {
+            logMessage(state.messages[i], i)
+        }
+        lastMessagesLength = state.messages.length
+    }
+    const state = await client.getState();
+    updateState(state)
+
+    setInterval(async () => {
+        try {
+            const state = await client.getState();
+            updateState(state);
+        } catch (err) {
+            console.log(err);
+        }
+    }, 500)
 }
 
-main()
+main().then(nothing => {
+    console.log(nothing);
+}).catch(err => {
+    console.log(err);
+})

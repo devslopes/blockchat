@@ -1,0 +1,15 @@
+{
+  "app_hash": "ec72f2afbdc19d3cf4b7bcba337982be2b4d7d41",
+  "chain_id": "blockchat",
+  "genesis_time": "0001-01-01T00:00:00Z",
+  "validators": [
+    {
+      "name": "",
+      "power": 10,
+      "pub_key": {
+        "data": "C2BFD789B00EC0D42A4FC53EF31AB334912E262D50C4044162A3200D10FDD1F6",
+        "type": "ed25519"
+      }
+    }
+  ]
+}
