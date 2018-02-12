@@ -50,7 +50,7 @@ let opts = {
  
  ![project](readme-assets/project-status-1.png?raw=true "project")
  
- 7. Grab the public key data and put it in the `genesis.json` file in the `validators` array. It might look similar to:
+ 7. Grab the public key data from each validator json file and put it in the `genesis.json` file in the `validators` array. It might look similar to:
  
  ```
  {
