@@ -1,20 +1,18 @@
 let lotion = require('lotion');
 let os = require('os')
-// let genesis = require.resolve('./devslopes-genesis.json');
-let port = 3000;
-
+let genesis = require.resolve('./devslopes-genesis.json');
+let lotionPort = process.env.PORT || 3000;
+let dev = process.env.DEV || false;
 async function main() {
-    console.log('starting blockchain interface on port ' + port + '...\n');
+    console.log('starting blockchain interface on port ' + lotionPort + '...\n');
     console.log(
         ` 
-        chain state : http://localhost:${port}/state
-        transactions: http://localhost:${port}/txs
+        chain state : http://localhost:${lotionPort}/state
+        transactions: http://localhost:${lotionPort}/txs
         `
     )
-
     let opts = {
-        keys: os.homedir() + '/.lotion/priv_validator.json',
-        genesis: genesis,
+        lotionPort: lotionPort,
         initialState: {
             messages: [
                 { sender: 'Devslopes', message: 'secure chat' },
@@ -22,6 +20,11 @@ async function main() {
                 { sender: 'Devslopes', message: 'endless uses' }
             ]
         }
+    }
+    if (!dev) {
+        opts.devMode = true;
+        opts.genesis = genesis;
+        opts.keys = os.homedir() + '/.lotion/priv_validator.json';
     }
     let app = lotion(opts);
     let msgHandler = (state, tx) => {
@@ -40,9 +43,11 @@ async function main() {
     }
 
     app.use(msgHandler);
-    app.listen(3000).then(genesis => {
+    app.listen(lotionPort).then(genesis => {
         console.log('connected');
         console.log(genesis);
+    }, err => {
+        console.log(err);
     })
 }
 
