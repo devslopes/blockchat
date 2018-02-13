@@ -1,6 +1,7 @@
 let lotion = require('lotion');
 let genesis = require.resolve('./genesis.json');
 let lotionPort = 3000;
+let config = require('./config.js')
 let dev = process.env.DEV || false;
 async function main() {
     console.log('starting blockchain interface on port ' + lotionPort + '...\n');
@@ -12,6 +13,8 @@ async function main() {
     )
     let opts = {
         lotionPort: lotionPort,
+        p2pPort: 46656,
+        tendermintPort: 46657,
         // If you ever change initial state, your app will have a new GCI - be careful
         initialState: {
             messages: [
@@ -23,8 +26,10 @@ async function main() {
     };
     if (dev) {
         opts.devMode = true;
+        opts.lite = true;
     } else {
         opts.keys = 'priv_validator.json';
+        opts.peers = config.peers;
         opts.genesis = genesis;
     }
     let app = lotion(opts);
