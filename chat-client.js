@@ -18,7 +18,7 @@ async function main() {
     let timeout = setTimeout(() => console.log('Connecting...'), 2000);
     let client;
     try {
-        client = await connect(APP_ID);
+        client = await connect(chatId);
         console.log('connected');
     } catch (err) {
         console.log(err);

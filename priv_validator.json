@@ -1,3 +1,3 @@
 {
-  "message": "Paste your validator JSON in this file before launching this Docker container"
+  "message": "Before launching this Docker node - put the priv_validator.json data in here for the target machine"
 }

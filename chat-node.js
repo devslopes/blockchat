@@ -1,6 +1,6 @@
 let lotion = require('lotion');
-let genesis = require.resolve('genesis.json');
-let lotionPort = process.env.PORT || 3000;
+let genesis = require.resolve('./genesis.json');
+let lotionPort = 3000;
 let dev = process.env.DEV || false;
 async function main() {
     console.log('starting blockchain interface on port ' + lotionPort + '...\n');
@@ -11,7 +11,6 @@ async function main() {
         `
     )
     let opts = {
-        // Some people may choose to use a different port for lotion - allow them the option
         lotionPort: lotionPort,
         // If you ever change initial state, your app will have a new GCI - be careful
         initialState: {
