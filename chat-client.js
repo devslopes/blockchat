@@ -1,28 +1,19 @@
 let leftPad = require('left-pad')
 let { connect } = require('lotion');
 let readline = require('readline')
-let argv = require('minimist')(process.argv.slice(2))
-
+let genesis = require.resolve('./genesis.json');
+let config = require('./config.js')
 let rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 rl.setPrompt('choose a username ~ ');
 
-let chatId = argv.chat;
-
 async function main() {
-
-    if (!chatId) return console.log('Must enter the chatroom id with -chat argument. The id is the GCI of the app.')
-
     let timeout = setTimeout(() => console.log('Connecting...'), 2000);
-    let client;
-    try {
-        client = await connect(chatId);
-        console.log('connected');
-    } catch (err) {
-        console.log(err);
-    }
+    let nodes = config.peers.map((addr) => `ws://${addr}`)
+    let client = await connect(null, { genesis, nodes});
+    console.log('connected');
 
     clearTimeout(timeout);
     rl.prompt()
@@ -84,7 +75,7 @@ async function main() {
                 message,
                 sender: username
             });
-            //const state = await client.getState();
+            const state = await client.getState();
             updateState(state)
         }
 

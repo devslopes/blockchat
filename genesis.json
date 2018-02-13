@@ -10,22 +10,6 @@
         "data": "7520E846D1285ED8E8C7B4875AF72DC1D0C6E953386FB0D0DE53AB16FB672901",
         "type": "ed25519"
       }
-    },
-    {
-      "name": "blockchat-2-3002",
-      "power": 10,
-      "pub_key": {
-        "type": "ed25519",
-        "data": "FD6118D1A406DB5CA4529F9FECDD0131391572B20E2A5AC157BA86FF53E377A0"
-      }
-    },
-    {
-      "name": "blockchat-3-3003",
-      "power": 10,
-      "pub_key": {
-        "type": "ed25519",
-        "data": "C9C6303453078CE5CFAC79DEE0EAC88CA96F5B4C3B6488334151861B7358D716"
-      }
     }
   ]
 }
