@@ -1,12 +1,7 @@
-FROM node:carbon
-RUN ["apt-get", "update"]
-RUN ["apt-get", "install", "-y", "vim"]
-WORKDIR /usr/blockchat
+FROM devslopes/ubuntu-node:latest
+
 COPY package*.json ./
 RUN npm install
-
-# Bundle app source
-COPY . .
 
 EXPOSE 3000 46656 46657
 
