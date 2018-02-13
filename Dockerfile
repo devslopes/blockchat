@@ -1,4 +1,6 @@
 FROM node:carbon
+RUN ["apt-get", "update"]
+RUN ["apt-get", "install", "-y", "vim"]
 WORKDIR /usr/blockchat
 COPY package*.json ./
 RUN npm install
