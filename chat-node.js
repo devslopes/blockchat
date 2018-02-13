@@ -1,5 +1,4 @@
 let lotion = require('lotion');
-let os = require('os')
 let genesis = require.resolve('genesis.json');
 let lotionPort = process.env.PORT || 3000;
 let dev = process.env.DEV || false;
@@ -26,7 +25,7 @@ async function main() {
     if (dev) {
         opts.devMode = true;
     } else {
-        opts.keys = os.homedir() + 'priv_validator.json';
+        opts.keys = 'priv_validator.json';
         opts.genesis = genesis;
     }
     let app = lotion(opts);
