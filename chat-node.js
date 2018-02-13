@@ -1,6 +1,6 @@
 let lotion = require('lotion');
 let os = require('os')
-let genesis = require.resolve('./devslopes-genesis.json');
+let genesis = require.resolve('genesis.json');
 let lotionPort = process.env.PORT || 3000;
 let dev = process.env.DEV || false;
 async function main() {
@@ -12,7 +12,9 @@ async function main() {
         `
     )
     let opts = {
+        // Some people may choose to use a different port for lotion - allow them the option
         lotionPort: lotionPort,
+        // If you ever change initial state, your app will have a new GCI - be careful
         initialState: {
             messages: [
                 { sender: 'Devslopes', message: 'secure chat' },
@@ -20,11 +22,12 @@ async function main() {
                 { sender: 'Devslopes', message: 'endless uses' }
             ]
         }
-    }
-    if (!dev) {
+    };
+    if (dev) {
         opts.devMode = true;
+    } else {
+        opts.keys = os.homedir() + 'priv_validator.json';
         opts.genesis = genesis;
-        opts.keys = os.homedir() + '/.lotion/priv_validator.json';
     }
     let app = lotion(opts);
     let msgHandler = (state, tx) => {

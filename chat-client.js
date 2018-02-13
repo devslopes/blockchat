@@ -1,8 +1,7 @@
 let leftPad = require('left-pad')
 let { connect } = require('lotion');
-let genesis = require('./genesis.json');
-let config = require('./peers.js')
 let readline = require('readline')
+let argv = require('minimist')(process.argv.slice(2))
 
 let rl = readline.createInterface({
     input: process.stdin,
@@ -10,9 +9,12 @@ let rl = readline.createInterface({
 });
 rl.setPrompt('choose a username ~ ');
 
-const APP_ID = "89a6244c04b9560fe2a8c75f1e75c432c00961b1ac254744866cf37fb1193e7d";
+let chatId = argv.chat;
 
 async function main() {
+
+    if (!chatId) return console.log('Must enter the chatroom id with -chat argument. The id is the GCI of the app.')
+
     let timeout = setTimeout(() => console.log('Connecting...'), 2000);
     let client;
     try {
@@ -110,8 +112,4 @@ async function main() {
     }, 500)
 }
 
-main().then(nothing => {
-    console.log(nothing);
-}).catch(err => {
-    console.log(err);
-})
+main();
