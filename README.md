@@ -107,6 +107,8 @@ let opts = {
  
  11. SSH into your new Digital Ocean Droplet. Clone this repository: [https://github.com/devslopes/blockchat.git](https://github.com/devslopes/blockchat.git)
  
+ By default Digital Ocean exposes all ports. If you have any issues, just make sure that ports `46656` and `46657` are exposed to the outside world.
+ 
  12. Copy the data from one of your `priv_validator.json` files into the the repo you just clone in a file named `priv_validator.json`. Again make sure this file is *never* added to version control.
  
  13. Run your chat-node via `node chat-node.js`. If you are creating 3 validators (or more) this will look frozen like it isn't doing anything. That is because *2/3 of all validators must be online before it starts writing blocks*. Once your other validators are online you would see output in the console here. Also note that you need a node process manager so the app can run all the time. I recommend [pm2](http://pm2.keymetrics.io/). 
@@ -116,6 +118,16 @@ let opts = {
  14. Create two more droplets on Digital Ocean OR figure out how to work with Docker, or Docker Swarm (it isn't overly easy - but can save you money) so you can have 3 containers in the same droplet. Clone repos on those machines and add the associated private keys in the `priv_validator.json` files
  
  15. Once at least 2/3 of the validators listed in `genesis.json` are online your blockchain validator nodes will start writing blocks (and logging output)
+ 
+## Problem Solving
+
+There are a handful of things that could go wrong. Here are a few to account for:
+
+1. Don't screw up your private keys and genesis.json - each validator must have a unique private key, and then must provide the public key and that key must be in the genesis.json - if you accidentally put two of the same public key in the genesis or if a key exists in genesis that is not in a private key on the server things wont work
+2. If you ever change ANYTHING in genesis.json the app can break. If changes need to be made to genesis.json after your validators are live, just make sure that your validators update the source code asap.
+3. Try not to use GCI to connect to a blockchain - they change often. If connecting as a light client insert the peers and the genesis instead
+4. It's best to test with ONE validator first, then add more - that way you can solve problems along the way.
+5. When developing, do so with `devMode: true` so it deletes the blockchain data each run - otherwise you'll have bugs while making so many changes to the blockchain
  
 
 ## Creating a Chat Client
