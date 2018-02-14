@@ -9,7 +9,7 @@ To join a bunch of developer nerds in a global chat simply:
 To understand how all this works:
 
 1. Look at the source code
-2. Create your own blockchain following the steps below
+2. Create your own blockchain following the steps below. Experiment with the code!
 
 This blockchain app uses [LotionJS](https://github.com/keppel/lotion) - which is really the world's first Javascript interface for blockchain development. Lotion uses [Tendermint](https://tendermint.readthedocs.io/en/master/) for p2p, security, consensus and more.
 
