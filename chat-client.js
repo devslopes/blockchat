@@ -1,84 +1,88 @@
-let axios = require('axios')
-let argv = require('minimist')(process.argv.slice(2))
-let leftPad = require('left-pad')
-let lotion = require('lotion');
-let chatId = argv.j
-let peers = argv.p
+/**
+ * These libraries having nothing to do with Lotion
+ * They help us read text from the shell and do some white space
+ * formatting so our messages don't look ugly
+ */
+const fs = require('fs');
+const swearjar = require('swearjar');
+let leftPad = require('left-pad');
+let readline = require('readline');
+let rl = readline.createInterface({input: process.stdin, output: process.stdout});
+rl.setPrompt('enter a username: ');
 
-let readline = require('readline')
-let rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: 'choose a username ~ '
-});
-let port = 3000;
+/**
+ * connect will allow any computer (that can run NodeJS) to operate
+ * a light node which does not create a copy of the blockchain on the machine's hard drive
+ */
+let { connect } = require('lotion');
+
+/**
+ * The genesis.json and the peers inside of config.js
+ * helps our light client find validators and perform transactions
+ */
+let genesis = JSON.parse(fs.readFileSync(require.resolve('./genesis.json'), { encoding: 'utf8' }));
+let config = require('./config.js')
+
 async function main() {
-    console.log('starting blockchain interface on port ' + port + '...\n');
-    console.log(
-        ` 
-    chain state : http://localhost:${port}/state
-    transactions: http://localhost:${port}/txs
-`
-    )
-    let opts = {
-        initialState: {
-            messages: [
-                { sender: 'spentak', message: 'secure chat' },
-                { sender: 'spentak', message: 'on the blockchain' },
-                { sender: 'spentak', message: 'endless uses' }
-            ]
-        },
-        logTendermint: false
-    }
-    let app = lotion(opts);
-    let bar = '================================================================='
-    let link = '                                |                                '
-    function logMessage({ sender, message }, index) {
-        readline.clearLine(process.stdout, 0)
-        readline.cursorTo(process.stdout, 0)
-        if (!(index % 3)) {
-            console.log(bar)
-        }
-        console.log(
-            '|  ' +
-            sender +
-            leftPad(': ', 12 - sender.length) +
-            message +
-            leftPad('|', 50 - message.length)
-        )
-        if (index % 3 === 2) {
-            console.log(bar)
-            console.log(link)
-            console.log(link)
-            console.log(link)
-        }
-        rl.prompt(true)
-    }
+    try {
+        /**
+         * Only show the word Connnecting if it takes more than 2 seconds
+         * to connect otherwise clear it out below
+         */
+        let timeout = setTimeout(() => console.log('Connecting...'), 2000);
+        /**
+         * Append ws:// to the front of each validator IP address and the
+         * tendermint port 46657 to the end. ws means connect via websockets
+         * this step is required in order for connect to work
+         */
+        let nodes = config.peers.map((addr) => `ws://${addr}:46657`);
 
-    let msgHandler = (state, tx) => {
-        if (
-            typeof tx.sender === 'string' &&
-            typeof tx.message === 'string' &&
-            tx.message.length <= 50
-        ) {
-            if (tx.message !== '') {
-                state.messages.push({
-                    sender: tx.sender,
-                    message: tx.message
-                });
-            }
-        }
-    }
+        /**
+         * Use Javascript object literal syntax to grab the current state of the data in the blockchain
+         * and to grab the send function. Note the keyword async in the function above and the keyword
+         * await here below. This is an async function.
+         */
 
-    app.use(msgHandler);
-    app.listen(3000).then(genesisKey => {
-        console.log('chat room id is ' + genesisKey.GCI + '\n')
+        let { send, state } = await connect(null, { genesis, nodes});
+
+        console.log('connected');
+        clearTimeout(timeout);
+
+        /**
+         * Ask the user to enter a username for the chatroom
+         */
         rl.prompt()
-
-        let username
+        /**
+         * The logMessage function has nothing to do with Lotion - it helps make messages
+         * look pretty in the shell whenever a new message is posted
+         * this is a shell based chat app ya know!
+         */
+        let bar = '================================================================='
+        let link = '                                |                                '
+        function logMessage({ sender, message }, index) {
+            readline.clearLine(process.stdout, 0)
+            readline.cursorTo(process.stdout, 0)
+            if (!(index % 3)) {
+                console.log(bar)
+            }
+            console.log(
+                '|  ' +
+                sender +
+                leftPad(': ', 12 - sender.length) +
+                message +
+                leftPad('|', 50 - message.length)
+            )
+            if (index % 3 === 2) {
+                console.log(bar)
+                console.log(link)
+                console.log(link)
+                console.log(link)
+            }
+            rl.prompt(true)
+        }
 
         function usernameError(name) {
-            if (name.length > 12) {
+            if (name.length > 20) {
                 return 'Username is too long'
             }
             if (name.length < 3) {
@@ -87,9 +91,18 @@ async function main() {
             if (name.indexOf(' ') !== -1) {
                 return 'Username may not contain a space'
             }
+            if (swearjar.profane(name)) {
+                return 'Oh fetch! That username just won\'t do';
+            }
             return false
         }
 
+        let username;
+        /**
+         * This listens for when a user presses enter on the shell after
+         * entering some text. If it is for the username, save it in the username variable
+         * If it is a message use the Lotion.connect.send function
+         */
         rl.on('line', async line => {
             readline.moveCursor(process.stdout, 0, -1)
             readline.clearScreenDown(process.stdout)
@@ -100,42 +113,49 @@ async function main() {
                     console.log(e)
                 } else {
                     username = line
+                    updateState();
+
+                    /**
+                     * Check for new messages every 3 seconds
+                     */
+                    setInterval(() => {
+                        updateState();
+                    }, 3000)
                     rl.setPrompt('> ')
                 }
             } else {
-                let message = line
-                let result = await axios({
-                    url: 'http://localhost:' + port + '/txs',
-                    method: 'post',
-                    params: {
-                        return_state: true
-                    },
-                    data: {
-                        message,
-                        sender: username
-                    }
-                })
-                updateState(result.data.state)
+                /**
+                 * Result is NOT the updated data - it is the success/failure result
+                 * of the transaction that was just attempted
+                 */
+                let message = swearjar.censor(line);
+                const result = await send({message, sender: username});
+
+                updateState()
             }
 
             rl.prompt(true)
         })
 
-        // poll blockchain state
-        let lastMessagesLength = 0
-        function updateState(state) {
-            for (let i = lastMessagesLength; i < state.messages.length; i++) {
-                logMessage(state.messages[i], i)
+        /**
+         * We keep track of the length of the last messages displayed
+         * Then we do an async fetch to get the messages from the blockchain
+         * If the length of the new messages is longer than our last recorded
+         * length it means new messages have been added to the blockchain
+         * Then for each new message we log it. The cool thing about our array
+         * in the blockchain is that the order of messages will always be the same
+         */
+        let lastMessagesLength = 0;
+        async function updateState() {
+            let messages = await state.messages;
+            for (let i = lastMessagesLength; i < messages.length; i++) {
+                logMessage(messages[i], i)
             }
-            lastMessagesLength = state.messages.length
+            lastMessagesLength = messages.length;
         }
-        setInterval(async () => {
-            let { data } = await axios.get('http://localhost:' + port + '/state')
-            updateState(data)
-        }, 500)
-    }).catch((err) => {
-        console.error(err.stack)
-    })
+    } catch (err) {
+        console.log(err);
+    }
 }
 
-main()
+main();
