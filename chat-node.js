@@ -26,6 +26,10 @@ async function main() {
     };
     if (dev) {
         opts.devMode = true;
+        opts.peers = config.peers;
+        opts.genesis = genesis;
+        opts.lite = true;
+        opts.target = config.peers[0];
     } else {
         opts.keys = 'priv_validator.json';
         opts.peers = config.peers;

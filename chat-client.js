@@ -7,11 +7,11 @@ let rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
-rl.setPrompt('choose a username ~ ');
+rl.setPrompt('enter a username: ');
 
 async function main() {
     let timeout = setTimeout(() => console.log('Connecting...'), 2000);
-    let nodes = config.peers.map((addr) => `ws://${addr}`)
+    let nodes = config.peers.map((addr) => `ws://${addr}:46657`);
     let client = await connect(null, { genesis, nodes});
     console.log('connected');
 
@@ -71,6 +71,7 @@ async function main() {
             }
         } else {
             let message = line;
+            console.log(message);
             const result = await client.send({
                 message,
                 sender: username
@@ -90,8 +91,6 @@ async function main() {
         }
         lastMessagesLength = state.messages.length
     }
-    const state = await client.getState();
-    updateState(state)
 
     setInterval(async () => {
         try {
