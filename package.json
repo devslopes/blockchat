@@ -1,16 +1,29 @@
 {
   "name": "blockchat",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A simple blockchain chat app built with Javascript, Lotion, and Tendermint",
+  "author": "Mark Price",
+  "license": "MIT",
+  "main": "chat-node.js",
+  "keywords": [
+    "lotionjs",
+    "tendermint",
+    "blockchain",
+    "proof of stake"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devslopes/blockchat"
+  },
   "engines": {
     "node": ">=8.2"
   },
   "scripts": {
     "start": "node chat-node.js"
   },
-  "author": "",
-  "license": "MIT",
+  "bin": {
+    "blockchat": "bin/chat-client.js"
+  },
   "dependencies": {
     "axios": "^0.17.1",
     "get-port": "^3.2.0",

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * These libraries having nothing to do with Lotion
  * They help us read text from the shell and do some white space
@@ -20,8 +21,8 @@ let { connect } = require('lotion');
  * The genesis.json and the peers inside of config.js
  * helps our light client find validators and perform transactions
  */
-let genesis = JSON.parse(fs.readFileSync(require.resolve('./genesis.json'), { encoding: 'utf8' }));
-let config = require('./config.js')
+let genesis = JSON.parse(fs.readFileSync(require.resolve('../genesis.json'), { encoding: 'utf8' }));
+let config = require('../config.js')
 
 async function main() {
     try {
