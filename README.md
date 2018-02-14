@@ -1,3 +1,20 @@
+## Getting Started
+
+To join a bunch of developer nerds in a global chat simply:
+
+1. Run `npm install blockchat -g`
+2. Run `blockchat`
+3. Chat
+
+To understand how all this works:
+
+1. Look at the source code
+2. Create your own blockchain following the steps below
+
+This blockchain app uses [LotionJS](https://github.com/keppel/lotion) - which is really the world's first Javascript interface for blockchain development. Lotion uses [Tendermint](https://tendermint.readthedocs.io/en/master/) for p2p, security, consensus and more.
+
+Lotion & Tendermint use Proof of Stake for consensus (which means no miner nodes needed!).
+
 ## Free Digital Ocean Credits
 
 Get $15 *FREE* credit for Digital Ocean hosting. Use this code on the billing page: `DODEVSLOPES15`
