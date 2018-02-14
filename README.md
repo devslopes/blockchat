@@ -3,9 +3,10 @@
 
 To join a bunch of developer nerds in a global chat simply:
 
-1. Run `npm install blockchat -g`
-2. Run `blockchat`
-3. Chat
+1. Install node 8.2+ or use `nvm use 8.2`
+2. Run `npm install blockchat -g`
+3. Run `blockchat`
+4. Chat
 
 To understand how all this works:
 
