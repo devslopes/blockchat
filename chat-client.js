@@ -12,11 +12,14 @@ rl.setPrompt('enter a username: ');
 async function main() {
     let timeout = setTimeout(() => console.log('Connecting...'), 2000);
     let nodes = config.peers.map((addr) => `ws://${addr}:46657`);
-    let client = await connect(null, { genesis, nodes});
+    console.log(nodes);
+    let { state, send } = await connect(null, { genesis, nodes});
     console.log('connected');
 
     clearTimeout(timeout);
     rl.prompt()
+
+    console.log(await state.messages);
 
     let bar = '================================================================='
     let link = '                                |                                '
@@ -72,11 +75,11 @@ async function main() {
         } else {
             let message = line;
             console.log(message);
-            const result = await client.send({
+            const result = await send({
                 message,
                 sender: username
             });
-            const state = await client.getState();
+
             updateState(state)
         }
 
@@ -85,16 +88,17 @@ async function main() {
 
     // poll blockchain state
     let lastMessagesLength = 0
-    function updateState(state) {
-        for (let i = lastMessagesLength; i < state.messages.length; i++) {
-            logMessage(state.messages[i], i)
+    async function updateState(state) {
+        const messages = await state.messages;
+        for (let i = lastMessagesLength; i < messages.length; i++) {
+            logMessage(messages[i], i)
         }
-        lastMessagesLength = state.messages.length
+        lastMessagesLength = messages.length
     }
 
     setInterval(async () => {
         try {
-            const state = await client.getState();
+            const { state } = await connect(null, { genesis, nodes});
             updateState(state);
         } catch (err) {
             console.log(err);
