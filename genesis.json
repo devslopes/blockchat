@@ -4,7 +4,7 @@
   "genesis_time": "0001-01-01T00:00:00Z",
   "validators": [
     {
-      "name": "blockchat-1-3001",
+      "name": "devslopes",
       "power": 10,
       "pub_key": {
         "data": "7520E846D1285ED8E8C7B4875AF72DC1D0C6E953386FB0D0DE53AB16FB672901",

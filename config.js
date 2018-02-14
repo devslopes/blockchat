@@ -1,6 +1,8 @@
 module.exports = {
-    // validator public IP addresses
+    /**
+     * IP Addresses for each validator node
+     */
     peers: [
-        '159.65.168.34',
+        '159.65.168.34'
     ]
 }
