@@ -6,6 +6,8 @@ To join a bunch of developer nerds in a global chat simply:
 2. Run `blockchat`
 3. Chat
 
+**Requires Node >=8.2**
+
 To understand how all this works:
 
 1. Look at the source code
