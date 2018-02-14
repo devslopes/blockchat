@@ -1,3 +1,4 @@
+![blockchat](readme-assets/blockchat.png?raw=true "blockchat")
 ## Getting Started
 
 To join a bunch of developer nerds in a global chat simply:
