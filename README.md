@@ -1,3 +1,9 @@
+## Free Digital Ocean Credits
+
+Get $15 *FREE* credit for Digital Ocean hosting. Use this code on the billing page: `DODEVSLOPES15`
+
+You will need hosting if you are to launch your own blockchain.
+
 ## Creating Your Own Blockchain
 
 Fork this repo onto your own Github.
@@ -87,55 +93,42 @@ let opts = {
  ```
  8. Now that we have private keys for 3 nodes/machines, and we have our genesis file, we have everything we need to start a blockchain network in a realistic scenario.
  
- 9. We need to tell Lotion where to find the private keys for each machine as well as the genesis file. In `chat-node.js` change add this to the top of your file:
+ 9. Make sure the code is bringing in the genesis file in the `chat-node.js`
  
  `let genesis = require.resolve('./genesis.json');`
  
  This tells lotion who our validators are and information about our app.
  
- 10. Before we upload our Lotion app to our server, let's get the private keys set up on server. You will need a hosting service like `AWS` or `Digital Ocean` that can run the Lotion app with all the proper ports/etc.
+ 10. You will need a hosting service like `AWS` or `Digital Ocean` that can run the Lotion app with all the proper ports/etc. I recommend Digital Ocean.
  
- Log in to your first machine. We need to get `priv_validator1.json` on that machine. Copy the data from inside of it into `~./lotion/priv_validator.json` on the remote server.
+ Create a new Droplet (and don't forget to use the free credits above). I usually choose a *One Click App* and pick *Docker* - you should just make sure it has Node on it.
  
- Do this same thing on the 2nd server, except grabbing `priv_validator2.json` and copying it into `~./lotion/priv_validator.json` on the 2nd server.
+ Add your SSH keys to Digital Ocean or create a root password. If you need help with that see [here](https://www.digitalocean.com/community/tutorials/how-to-connect-to-your-droplet-with-ssh).
  
- Do this same thing with the 3rd server and 3rd validator file.
+ 11. SSH into your new Digital Ocean Droplet. Clone this repository: [https://github.com/devslopes/blockchat.git](https://github.com/devslopes/blockchat.git)
  
- 11. Now `delete` these 3 `priv_validator` json files from your local repo here on this machine. You basically have created a private/public key pair so Lotion can verify the validators.
+ By default Digital Ocean exposes all ports. If you have any issues, just make sure that ports `46656` and `46657` are exposed to the outside world.
  
- 12. Now let's make another code change here in the Lotion app. In `chat-node.js` at the top of the file add:
+ 12. Copy the data from one of your `priv_validator.json` files into the the repo you just clone in a file named `priv_validator.json`. Again make sure this file is *never* added to version control.
  
- `let os = require('os')`
+ 13. Run your chat-node via `node chat-node.js`. If you are creating 3 validators (or more) this will look frozen like it isn't doing anything. That is because *2/3 of all validators must be online before it starts writing blocks*. Once your other validators are online you would see output in the console here. Also note that you need a node process manager so the app can run all the time. I recommend [pm2](http://pm2.keymetrics.io/). 
  
- We'll use this to get the path of the operating system home.
+ Once installed you can do something like `pm2 start node-chat.js --name blockchat`
  
- Then in the options:
- ```
-let opts = {
-        keys: os.homedir() + '/.lotion/priv_validator.json',
-        genesis: genesis,
-        initialState: {
-            messages: [
-                { sender: 'Devslopes', message: 'secure chat' },
-                { sender: 'Devslopes', message: 'on the blockchain' },
-                { sender: 'Devslopes', message: 'endless uses' }
-            ]
-        }
-    }
- ```
- Be sure that `devMode` is gone. We have added the path to the keys as well as the genesis json.
+ 14. Create two more droplets on Digital Ocean OR figure out how to work with Docker, or Docker Swarm (it isn't overly easy - but can save you money) so you can have 3 containers in the same droplet. Clone repos on those machines and add the associated private keys in the `priv_validator.json` files
  
- This process may have seem long, but all we have done is created 3 validators. You need validators for your blockchain to perform consensus. But we also needed to register them in the `genesis.json` file so any client app that wants use our Lotion app knows where to find the validators.
+ 15. Once at least 2/3 of the validators listed in `genesis.json` are online your blockchain validator nodes will start writing blocks (and logging output)
  
-13. Now push the code changes here up to your Github repo.
+## Problem Solving
 
-14. Log in to each machine, then clone this repo wherever you want.
+There are a handful of things that could go wrong. Here are a few to account for:
 
-cd into the project and run the node by running `node chat-node.js`
-
-This will start your validator node. You might want to use a node runner like `pm2` to keep this node running all the time in the background. Keep in mind if you want a healthy blockchain you will need to know how to keep this server running at all times.
-
-15. Copy the GCI outputs from one of your validator nodes.
+1. Don't screw up your private keys and genesis.json - each validator must have a unique private key, and then must provide the public key and that key must be in the genesis.json - if you accidentally put two of the same public key in the genesis or if a key exists in genesis that is not in a private key on the server things wont work
+2. If you ever change ANYTHING in genesis.json the app can break. If changes need to be made to genesis.json after your validators are live, just make sure that your validators update the source code asap.
+3. Try not to use GCI to connect to a blockchain - they change often. If connecting as a light client insert the peers and the genesis instead
+4. It's best to test with ONE validator first, then add more - that way you can solve problems along the way.
+5. When developing, do so with `devMode: true` so it deletes the blockchain data each run - otherwise you'll have bugs while making so many changes to the blockchain
+ 
 
 ## Creating a Chat Client
 
