@@ -147,12 +147,4 @@ There are a handful of things that could go wrong. Here are a few to account for
 5. When developing, do so with `devMode: true` so it deletes the blockchain data each run - otherwise you'll have bugs while making so many changes to the blockchain
  
 
-## Creating a Chat Client
-
-Now you can let users use your blockchain using a Light client. A Light client on Lotion does *not* hold a copy of the blockchain data. It runs itself as a simple node on your blockchain so it can perform functions.
-
-Take the GCI that you copied and put it in `chat-client.js` ie
-`const APP_ID = "89a6244c04b9560fe2a8c75f1e75c432c00961b1ac254744866cf37fb1193e7d";`
-
-Update your repo. Now any of your friends can join your secure blockchat by simply running `node chat-client.js`
  
