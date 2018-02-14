@@ -1,26 +1,62 @@
+/**
+ * These libraries having nothing to do with Lotion
+ * They help us read text from the shell and do some white space
+ * formatting so our messages don't look ugly
+ */
 let leftPad = require('left-pad')
-let { connect } = require('lotion');
 let readline = require('readline')
-let genesis = require.resolve('./genesis.json');
-let config = require('./config.js')
-let rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+let rl = readline.createInterface({input: process.stdin, output: process.stdout});
 rl.setPrompt('enter a username: ');
 
+/**
+ * connect will allow any computer (that can run NodeJS) to operate
+ * a light node which does not create a copy of the blockchain on the machine's hard drive
+ */
+let { connect } = require('lotion');
+
+/**
+ * The genesis.json and the peers inside of config.js
+ * helps our light client find validators and perform transactions
+ */
+let genesis = require.resolve('./genesis.json');
+let config = require('./config.js')
+
 async function main() {
+    /**
+     * Only show the word Connnecting if it takes more than 2 seconds
+     * to connect otherwise clear it out below
+     */
     let timeout = setTimeout(() => console.log('Connecting...'), 2000);
+    /**
+     * Append ws:// to the front of each validator IP address and the
+     * tendermint port 46657 to the end. ws means connect via websockets
+     * this step is required in order for connect to work
+     */
     let nodes = config.peers.map((addr) => `ws://${addr}:46657`);
-    console.log(nodes);
+
+    /**
+     * Use Javascript object literal syntax to grab the current state of the data in the blockchain
+     * and to grab the send function. Note the keyword async in the function above and the keyword
+     * await here below. This is an async function.
+     */
     let { state, send } = await connect(null, { genesis, nodes});
+
     console.log('connected');
 
     clearTimeout(timeout);
+
+    /**
+     * Ask the user to enter a username for the chatroom
+     */
     rl.prompt()
 
     console.log(await state.messages);
 
+    /**
+     * The logMessage function has nothing to do with Lotion - it helps make messages
+     * look pretty in the shell whenever a new message is posted
+     * this is a shell based chat app ya know!
+     */
     let bar = '================================================================='
     let link = '                                |                                '
     function logMessage({ sender, message }, index) {
@@ -45,8 +81,6 @@ async function main() {
         rl.prompt(true)
     }
 
-    let username
-
     function usernameError(name) {
         if (name.length > 12) {
             return 'Username is too long'
@@ -60,6 +94,12 @@ async function main() {
         return false
     }
 
+    let username;
+    /**
+     * This listens for when a user presses enter on the shell after
+     * entering some text. If it is for the username, save it in the username variable
+     * If it is a message use the Lotion.connect.send function
+     */
     rl.on('line', async line => {
         readline.moveCursor(process.stdout, 0, -1)
         readline.clearScreenDown(process.stdout)
@@ -75,20 +115,28 @@ async function main() {
         } else {
             let message = line;
             console.log(message);
+
             const result = await send({
                 message,
                 sender: username
             });
 
-            updateState(state)
+            updateState()
         }
 
         rl.prompt(true)
     })
 
-    // poll blockchain state
+    /**
+     * We keep track of the length of the last messages displayed
+     * Then we do an async fetch to get the messages from the blockchain
+     * If the length of the new messages is longer than our last recorded
+     * length it means new messages have been added to the blockchain
+     * Then for each new message we log it. The cool thing about our array
+     * in the blockchain is that the order of messages will always be the same
+     */
     let lastMessagesLength = 0
-    async function updateState(state) {
+    async function updateState() {
         const messages = await state.messages;
         for (let i = lastMessagesLength; i < messages.length; i++) {
             logMessage(messages[i], i)
@@ -96,13 +144,11 @@ async function main() {
         lastMessagesLength = messages.length
     }
 
-    setInterval(async () => {
-        try {
-            const { state } = await connect(null, { genesis, nodes});
-            updateState(state);
-        } catch (err) {
-            console.log(err);
-        }
+    /**
+     * Check for new messages every half second
+     */
+    setInterval(() => {
+        updateState();
     }, 500)
 }
 

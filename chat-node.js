@@ -62,7 +62,26 @@ async function main() {
          */
         opts.genesis = genesis;
     }
+    /**
+     * Create a new instance of Lotion
+     */
     let app = lotion(opts);
+
+    /**
+     * Lotion uses middleware functions like msgHandler to intercept and process
+     * incoming transactions.
+     * Middleware/handlers MUST be DETERMINISTIC
+     * see http://www.ocoudert.com/blog/2011/05/30/how-to-make-software-deterministic/
+     *
+     * Write LOTS of error handling - cover every situation which you can think of
+     * Once a transaction is processed, it lives on the blockchain FOREVER
+     *
+     * msgHandler makes sure the incoming transaction message and sender (username) is of
+     * type string and that the message is around 50 characters (so the chat doesn't get spammed)
+     *
+     * Appending a new message to the blockchain is as simple as pushing the
+     * new message to the messages array in state
+     */
     let msgHandler = (state, tx) => {
         if (
             typeof tx.sender === 'string' &&
@@ -77,10 +96,20 @@ async function main() {
             }
         }
     }
-
+    /**
+     * Actually use the middleware handler
+     */
     app.use(msgHandler);
+
+    /**
+     * Start the Lotion app
+     */
     app.listen(lotionPort).then(genesis => {
         console.log('connected');
+        /**
+         * When a lotion app is started it will run some algorithms based on genesis.json
+         * and initialState (among other things) and generate important data in the directory ~/.lotion
+         */
         console.log(genesis);
     }, err => {
         console.log(err);
