@@ -1,6 +1,6 @@
 {
   "name": "blockchat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple blockchain chat app built with Javascript, Lotion, and Tendermint",
   "author": "Mark Price",
   "license": "MIT",
