@@ -1,3 +1,4 @@
 node_modules
 .idea
 priv_validator.json
+.DS_Store
