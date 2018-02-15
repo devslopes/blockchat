@@ -23,7 +23,7 @@ let { connect } = require('lotion');
  */
 let genesis = JSON.parse(fs.readFileSync(require.resolve('../genesis.json'), { encoding: 'utf8' }));
 let config = require('../config.js')
-
+const MAX_FETCHES = 5;
 async function main() {
     try {
         /**
@@ -98,6 +98,21 @@ async function main() {
             return false
         }
 
+        function startRefreshing() {
+            /**
+             * Check for new messages every few miliseconds
+             */
+            let pending = 0;
+            setInterval(async () => {
+                if (pending < MAX_FETCHES) {
+                    pending++;
+                    let messages = await state.messages;
+                    updateState(messages);
+                    pending--;
+                }
+            }, 500)
+        }
+
         let username;
         /**
          * This listens for when a user presses enter on the shell after
@@ -114,14 +129,7 @@ async function main() {
                     console.log(e)
                 } else {
                     username = line
-                    updateState();
-
-                    /**
-                     * Check for new messages every 3 seconds
-                     */
-                    setInterval(() => {
-                        updateState();
-                    }, 500)
+                    startRefreshing();
                     rl.setPrompt('> ')
                 }
             } else {
@@ -134,7 +142,7 @@ async function main() {
                     const result = await send({message, sender: username});
                 }
 
-                updateState()
+                updateState(await state.messages)
             }
 
             rl.prompt(true)
@@ -149,8 +157,7 @@ async function main() {
          * in the blockchain is that the order of messages will always be the same
          */
         let lastMessagesLength = 0;
-        async function updateState() {
-            let messages = await state.messages;
+        function updateState(messages) {
             if (messages && messages.length > 0) {
                 for (let i = lastMessagesLength; i < messages.length; i++) {
                     if (messages[i]) {
