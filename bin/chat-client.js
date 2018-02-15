@@ -130,7 +130,9 @@ async function main() {
                  * of the transaction that was just attempted
                  */
                 let message = swearjar.censor(line);
-                const result = await send({message, sender: username});
+                if (message && message.length >= 1 && message !== '') {
+                    const result = await send({message, sender: username});
+                }
 
                 updateState()
             }
@@ -149,10 +151,14 @@ async function main() {
         let lastMessagesLength = 0;
         async function updateState() {
             let messages = await state.messages;
-            for (let i = lastMessagesLength; i < messages.length; i++) {
-                logMessage(messages[i], i)
+            if (messages && messages.length > 0) {
+                for (let i = lastMessagesLength; i < messages.length; i++) {
+                    if (messages[i]) {
+                        logMessage(messages[i], i)
+                    }
+                }
+                lastMessagesLength = messages.length;
             }
-            lastMessagesLength = messages.length;
         }
     } catch (err) {
         console.log(err);
