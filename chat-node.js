@@ -53,7 +53,7 @@ async function main() {
          * Pass in an array of validator nodes IP addresses
          * Do IP addresses only, no port ie 159.65.168.34
          */
-        opts.peers = config.peers;
+        opts.peers = config.peers.map((addr) => `${addr}:46656`);
         /**
          * Possibly the most critical piece to the puzzle - the genesis.json
          * The unique app ID (GCI) is based on initialState and genesis.json
