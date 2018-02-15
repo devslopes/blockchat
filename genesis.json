@@ -5,7 +5,7 @@
   "validators": [
     {
       "name": "devslopes",
-      "power": 20,
+      "power": 50,
       "pub_key": {
         "data": "7520E846D1285ED8E8C7B4875AF72DC1D0C6E953386FB0D0DE53AB16FB672901",
         "type": "ed25519"
