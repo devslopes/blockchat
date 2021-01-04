@@ -25,7 +25,7 @@
     "blockchat": "bin/chat-client.js"
   },
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.21.1",
     "get-port": "^3.2.0",
     "left-pad": "^1.2.0",
     "lotion": "^0.1.13",
